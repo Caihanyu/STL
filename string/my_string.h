@@ -13,6 +13,8 @@ namespace cai
       char* _str;
       size_t _size;
       size_t _capacity; 
+
+      static size_t npos;
     public:
         typedef char* iterator;
         typedef const char* const_iterator;
@@ -127,6 +129,52 @@ namespace cai
             append(s);
             return *this;
         }
+
+        string& insert(size_t pos, const char* str)
+        {
+            size_t len = strlen(str);
+            assert(pos <= _size);
+            if(_size + len > _capacity)
+            {
+                reserve(_size + len);
+            }
+            // size_t是无符号数，在0位置会出错，故添加npos
+            size_t end = _size;
+            while(end >= pos && end != npos)
+            {
+                _str[end + len] = _str[end];
+                end--;
+            }
+            for(int i = 0; i < len; i++)
+            {
+                _str[i + pos] = str[i];
+            }
+            _size += len;
+            return *this;
+        }
+
+        string& insert(size_t pos, size_t n, char c)
+        {
+            assert(pos <= _size);
+            if(_size + n > _capacity)
+            {
+                reserve(_size + n);
+            }
+            // size_t是无符号数，在0位置会出错，故添加npos
+            size_t end = _size;
+            while(end >= pos && end != npos)
+            {
+                _str[end + n] = _str[end];
+                end--;
+            }
+            for(int i = 0; i < n; i++)
+            {
+                _str[i + pos] = c;
+            }
+            _size += n;
+            return *this;
+        }
     };
+    size_t string::npos = -1;
 };
 
