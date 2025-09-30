@@ -27,6 +27,14 @@ namespace cai
         {
             strcpy(_str, str);
         }
+        // 深拷贝，防止值传递导致的野指针问题
+        string(const string& str)
+        {
+            _str = new char[str._capacity + 1];
+            _size = str._size;
+            _capacity = str._capacity;
+            strcpy(_str,str._str);
+        }
         // 无参构造,见全缺省构造
         // string()
         // {
@@ -60,7 +68,7 @@ namespace cai
         }
 
         // 字符串转换
-        char* c_str() const
+        const char* c_str() const
         {
             return _str;
         }
@@ -138,7 +146,7 @@ namespace cai
             {
                 reserve(_size + len);
             }
-            // size_t是无符号数，在0位置会出错，故添加npos
+            // size_t是无符号数，在0位置会出错（会出现无负数情况，-1是一个大数），故添加npos
             size_t end = _size;
             while(end >= pos && end != npos)
             {
@@ -173,6 +181,73 @@ namespace cai
             }
             _size += n;
             return *this;
+        }
+
+        string& erase(size_t pos = 0, size_t len = npos)
+        {
+            assert(pos < _size);
+            if(len == npos || pos + len >= _size)
+            {
+                _str[pos] = '\0';
+                _size = pos;
+            }
+            else
+            {
+                size_t end = pos + len;
+                while(end <= _size)
+                {
+                    _str[pos++] = _str[end++];
+                }
+                _size -= len;
+            }
+            return *this;
+        }
+
+        size_t find(const char c, size_t pos = 0) const
+        {
+            assert(pos < _size);
+            for (size_t i = pos; i < _size; i++)
+            {
+                if(_str[i] == c)
+                {
+                    return i;
+                }
+            }
+            return npos;
+        }
+
+        size_t find(const char* s, size_t pos = 0) const
+        {
+            assert(pos < _size);
+            const char* ptr = strstr(_str, s);
+            if(ptr)
+            {
+                return ptr - _str;
+            }
+            else
+            {
+                return npos;
+            }
+        }
+
+        string substr (size_t pos = 0, size_t len = npos) const
+        {
+            assert(pos < _size);
+            string ret;
+            size_t end;
+            if(pos + len > _size || len == npos)
+            {
+                end = _size;
+            }
+            else
+            {
+                end = pos + len;
+            }
+            for (size_t i = pos; i < end; i++)
+            {
+                ret.push_back(_str[i]);
+            }
+            return ret;
         }
     };
     size_t string::npos = -1;

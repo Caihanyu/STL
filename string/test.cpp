@@ -2,9 +2,9 @@
 
 int main()
 {
-    cai::string s1("hello ");
-    s1.insert(6,"world");
+    cai::string s1("hello world");
     cout << s1.c_str() << endl;
-
+    cai::string s2 = s1.substr(0, 5);
+    cout << s2.c_str() << endl;
     return 0;
 }
