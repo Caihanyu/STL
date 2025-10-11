@@ -25,7 +25,8 @@ namespace cai
             ,_size(strlen(str))
             ,_capacity(strlen(str))
         {
-            strcpy(_str, str);
+            //strcpy(_str, str);
+            memcpy(_str, str, _size + 1);
         }
         // 深拷贝，防止值传递导致的野指针问题
         string(const string& str)
@@ -33,7 +34,8 @@ namespace cai
             _str = new char[str._capacity + 1];
             _size = str._size;
             _capacity = str._capacity;
-            strcpy(_str,str._str);
+            //strcpy(_str,str._str);
+            memcpy(_str, str._str, str._size + 1);
         }
         // 无参构造,见全缺省构造
         // string()
@@ -78,12 +80,12 @@ namespace cai
             return _size;
         }
 
-        void print()
-        {
-            cout << _str << endl;
-            cout << "size = " << _size << endl;
-            cout << "capacity = " << _capacity << endl;
-        }
+        // void print()
+        // {
+        //     cout << _str << endl;
+        //     cout << "size = " << _size << endl;
+        //     cout << "capacity = " << _capacity << endl;
+        // }
 
         char& operator[](size_t pos)
         {
@@ -97,12 +99,32 @@ namespace cai
         }
 
         // 增删查改
+        void resize(size_t n, char ch = '\0')
+        {
+            if(n < _size)
+            {
+                _size = n;
+                _str[_size] = '\0';
+            }
+            else
+            {
+                reserve(n);
+                for (size_t i = _size; i < n; i++)
+                {
+                    _str[i] = ch;
+                }
+                _size = n;
+                _str[_size] = '\0';
+            }
+        }
+
         void reserve(size_t n = 0)
         {
             if(n > _capacity)
             {
                 char* tmp = new char[n + 1];
-                strcpy(tmp, _str);
+                //strcpy(tmp, _str);
+                memcpy(tmp, _str, _size + 1);
                 delete[] _str;
                 _str = nullptr;
                 _str = tmp;
@@ -127,14 +149,22 @@ namespace cai
             {
                 reserve(_capacity + strlen(s));
             }
-            strcpy(_str + _size, s);
+            //strcpy(_str + _size, s);
+            memcpy(_str + _size, s, strlen(s) + 1);
             _size += strlen(s);
+            _str[_size] = '\0';
             return *this;
         }
 
         string& operator+=(const char* s)
         {
             append(s);
+            return *this;
+        }
+
+        string& operator+=(const char ch)
+        {
+            push_back(ch);
             return *this;
         }
 
@@ -251,5 +281,15 @@ namespace cai
         }
     };
     size_t string::npos = -1;
+
+    // 流
+    ostream& operator<<(ostream& out, const string& s)
+{
+    for(auto ch : s)
+    {
+        out << ch;
+    }
+    return out;
+}
 };
 
