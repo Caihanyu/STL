@@ -30,8 +30,18 @@ void string_test3()
     cout << s << endl;
 }
 
+void string_test4()
+{
+    cai::string s;
+    cin >> s;
+    cout << s << endl;
+
+    cin >> s;
+    cout << s << endl;
+}
+
 int main()
 {
-    string_test3();
+    string_test4();
     return 0;
 }

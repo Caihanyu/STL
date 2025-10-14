@@ -80,6 +80,12 @@ namespace cai
             return _size;
         }
 
+        void clear()
+        {
+            _str[0] = '\0';
+            _size = 0;
+        }
+
         // void print()
         // {
         //     cout << _str << endl;
@@ -284,12 +290,43 @@ namespace cai
 
     // 流
     ostream& operator<<(ostream& out, const string& s)
-{
+    {
     for(auto ch : s)
     {
         out << ch;
     }
     return out;
-}
+    }
+
+    istream& operator>>(istream& in, string& s)
+    {
+        // 先清空s中的数据
+        s.clear();
+        char ch = in.get();
+        // in默认不读取空格和换行
+        //in >> ch;
+        // 扩容空间优化，先开有限空间重复利用，避免多次扩容
+        char buff[128];
+        int i = 0;
+        while(ch != ' ' && ch != '\n')
+        {
+            buff[i++] = ch;
+            // buff满了就放到s中，置0重新开始
+            if(i == 127)
+            {
+                buff[i] = '\0';
+                s += buff;
+                i = 0;
+            }
+            //in >> ch;
+            ch = in.get();
+        }
+        if(i != 0)
+        {
+            buff[i] = '\0';
+            s += buff;
+        }
+        return in;
+    }
 };
 
