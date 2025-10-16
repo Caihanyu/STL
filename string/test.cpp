@@ -35,13 +35,27 @@ void string_test4()
     cai::string s;
     cin >> s;
     cout << s << endl;
+}
 
-    cin >> s;
-    cout << s << endl;
+void string_test5()
+{
+    cai::string s1;
+    cin >> s1;
+    cai::string s2;
+    cin >> s2;
+    cout << (s1 <= s2) << endl;
+}
+
+void string_test6()
+{
+    cai::string s1("hello world");
+    cai::string s2;
+    s2 = s1;
+    cout << s2 << endl;
 }
 
 int main()
 {
-    string_test4();
+    string_test6();
     return 0;
 }

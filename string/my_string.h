@@ -37,6 +37,34 @@ namespace cai
             //strcpy(_str,str._str);
             memcpy(_str, str._str, str._size + 1);
         }
+
+        // 赋值 存在两种写法
+        // 方案1
+        // string& operator=(const string& s)
+        // {
+        //     // 判断是否是自身赋值
+        //     if(this != &s)
+        //     {
+        //         delete[] this;
+        //         char* tmp = new char[s._capacity + 1];
+        //         memcpy(tmp, s._str, s._size + 1);
+        //         _str = tmp;
+        //         _size = s._size;
+        //         _capacity = s._capacity;
+        //     }
+        //     return *this;
+        // }
+        
+        // 方案2
+        string& operator=(const string& s)
+        {
+            string tmp(s);
+            // 这里可以单独做一个swap函数，STL也给了，但我偷懒~
+            std::swap(_str, tmp._str);
+            std::swap(_size, tmp._size);
+            std::swap(_capacity, tmp._capacity);
+            return *this;
+        }
         // 无参构造,见全缺省构造
         // string()
         // {
@@ -93,6 +121,63 @@ namespace cai
         //     cout << "capacity = " << _capacity << endl;
         // }
 
+        // 比较大小
+        bool operator==(const string& s) const
+        {
+            if(_size != s._size)
+                return false;
+            else
+            {
+                for (size_t i = 0; i < _size; i++)
+                {
+                    if(_str[i] != s._str[i])
+                        return false;
+                }
+                return true;
+                
+            }
+        }
+
+        bool operator!=(const string& s) const
+        {
+            return !(*this == s);
+        }
+
+        bool operator<(const string& s) const
+        {
+            size_t i = 0;
+            // 根据短的长度进行比较
+            size_t shortlen = min(_size, s._size);
+            for(; i < shortlen; i++)
+            {
+                if(_str[i] < s._str[i])
+                    return true;
+                else if(_str[i] > s._str[i])
+                    return false;
+            }
+            // 前shortlen都相同的情况下比长度
+            if(_size < s._size)
+                return true;
+            else
+                return false;
+        }
+
+        bool operator>(const string& s) const
+        {
+            return !(*this < s);
+        }
+
+        bool operator<=(const string& s) const
+        {
+            return (*this < s) || (*this == s);
+        }
+
+        bool operator>=(const string& s) const
+        {
+            return (*this > s) || (*this == s);
+        }
+
+        // 下标定位
         char& operator[](size_t pos)
         {
             assert(pos < _size);
@@ -285,26 +370,33 @@ namespace cai
             }
             return ret;
         }
+
+
     };
     size_t string::npos = -1;
 
     // 流
     ostream& operator<<(ostream& out, const string& s)
     {
-    for(auto ch : s)
-    {
-        out << ch;
-    }
-    return out;
+        for(auto ch : s)
+        {
+            out << ch;
+        }
+        return out;
     }
 
     istream& operator>>(istream& in, string& s)
     {
-        // 先清空s中的数据
-        s.clear();
-        char ch = in.get();
         // in默认不读取空格和换行
         //in >> ch;
+        char ch = in.get();
+        // 清除缓冲区的空格和换行
+        while(ch == ' ' || ch == '\n')
+        {
+            ch = in.get();
+        }
+        // 先清空s中的数据
+        s.clear();
         // 扩容空间优化，先开有限空间重复利用，避免多次扩容
         char buff[128];
         int i = 0;
