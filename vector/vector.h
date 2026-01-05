@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 
 namespace cai
 {
@@ -34,6 +35,31 @@ namespace cai
             ,_endofstorage(nullptr)
         {}
 
+        vector(const vector<T>& v)
+            :_start(nullptr)
+            ,_finish(nullptr)
+            ,_endofstorage(nullptr)
+        {
+            _start = new T[v.capacity()];
+            memcpy(_start, v._start, sizeof(T) * v.size());
+            _finish = _start + v.size();
+            _endofstorage = _start + v.capacity();
+        }
+
+        void swap(vector<T> v)
+        {
+            std::swap(_start, v._start);
+            std::swap(_finish, v._finish);
+            std::swap(_endofstorage, v._endofstorage);
+        }
+
+        // 利用传值深拷贝，v1 = v2
+        vector<T>& operator=(vector<T> v)
+        {
+            swap(v);
+            return *this;
+        }
+
         ~vector()
         {
             if(_start)
@@ -44,6 +70,16 @@ namespace cai
         }
 
         size_t capacity()
+        {
+            return _endofstorage - _start;
+        }
+
+        size_t size() const
+        {
+            return _finish - _start;
+        }
+
+        size_t capacity() const
         {
             return _endofstorage - _start;
         }
@@ -86,8 +122,27 @@ namespace cai
             }
         }
 
+        void resize(size_t n, const T& val = T())
+        {
+            // 两种空间情况：比原来短，比原来长
+                if(n < size())
+                {
+                    _finish = _start + n;
+                }
+                else
+                {
+                    reserve(n);
+                    while(_finish != _start + n)
+                    {
+                        *_finish = val;
+                        ++_finish;
+                    }
+                }
+        }
+
         void push_back(const T& val)
         {
+            /*
             if(_finish == _endofstorage)
             {
                 size_t newcapaity = capacity() == 0 ? 4 : capacity() * 2;
@@ -96,9 +151,17 @@ namespace cai
             // 用的new开的空间，直接在_finish位置赋值就好了
             *_finish = val;
             _finish++;
+            */
+            insert(end(), val);
         }
 
-        void insert(iterator pos, const T& val)
+        void pop_back()
+        {
+            erase(end());
+        }
+
+        // 要返回pos位置的迭代器
+        iterator insert(iterator pos, const T& val)
         {
             // 扩容导致迭代器失效，需要更新迭代器
             if(_finish == _endofstorage)
@@ -107,7 +170,7 @@ namespace cai
                 size_t len = pos - _start;
                 size_t newcapaity = capacity() == 0 ? 4 : capacity() * 2;
                 reserve(newcapaity);
-                // 更新迭代器
+                // 更新迭代器(迭代器失效问题)
                 pos = _start + len;
             }
             iterator end = _finish - 1;
@@ -118,6 +181,20 @@ namespace cai
             }
             *pos = val;
             _finish++;
+            return pos;
+        }
+        // 这里erase理论上迭代器不会失效，但最好还是认为迭代器失效，防止出现缩容情况
+        iterator erase(iterator pos)
+        {
+            assert(pos >= _start && pos < _finish);
+            iterator cur = pos + 1;
+            while(cur != _finish)
+            {
+                *(cur - 1) = *cur;
+                ++cur;
+            }
+            --_finish;
+            return pos;
         }
 
         private:
