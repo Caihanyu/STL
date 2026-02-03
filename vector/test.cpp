@@ -1,4 +1,7 @@
 #include"vector.h"
+#include <iostream>
+
+using namespace std;
 
 void vectortest1()
 {
@@ -76,10 +79,41 @@ void vectortest3()
     std::cout << std::endl;
 }
 
-void vectortest4();
+void vectortest4()
+{
+    /* vector<string>内部是自定义类型，浅拷贝会出问题（memcpy是浅拷贝）
+    ，自定义类型必须深拷贝*/
+    cai::vector<string> v;
+    v.push_back("111");
+    v.push_back("222");
+    v.push_back("333");
+    v.push_back("444");
+    v.push_back("555");
+
+    for (auto e : v)
+    {
+        cout << e << " ";
+    }
+    cout << endl;
+}
+
+void vectortest5()
+{
+    cai::vector<int> v(10,1);
+    for (auto e : v)
+    {
+        cout << e << " ";
+    }
+    cout << endl;
+    cai::vector<int> v1(v.begin(), v.end());
+    for (auto e : v1)
+    {
+        cout << e << " ";
+    }
+}
 
 int main()
 {
-    vectortest3();
+    vectortest5();
     return 0;
 }

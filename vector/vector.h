@@ -29,6 +29,50 @@ namespace cai
             {
                 return _finish;
             }
+        
+        // n个val初始化
+        vector(size_t n, const T& val = T())
+            :_start(nullptr)
+            ,_finish(nullptr)
+            ,_endofstorage(nullptr)
+        {
+            _start = new T[n];
+            for(size_t i = 0; i < n; i++)
+            {
+                _start[i] = val;
+            }
+            _finish = _start + n;
+            _endofstorage = _start + n;
+        }
+        // n个val初始化（int特殊版本）
+        vector(int n, const T& val = T())
+            :_start(nullptr)
+            ,_finish(nullptr)
+            ,_endofstorage(nullptr)
+        {
+            _start = new T[n];
+            for(size_t i = 0; i < n; i++)
+            {
+                _start[i] = val;
+            }
+            _finish = _start + n;
+            _endofstorage = _start + n;
+        }
+
+        // 迭代器范围构造函数
+        template<class Inputiterator>
+        vector(Inputiterator first, Inputiterator last)
+            :_start(nullptr)
+            ,_finish(nullptr)
+            ,_endofstorage(nullptr)
+        {
+            while(first != last)
+            {
+                push_back(*first);
+                ++first;
+            }
+        }
+
         vector()
             :_start(nullptr)
             ,_finish(nullptr)
@@ -41,7 +85,10 @@ namespace cai
             ,_endofstorage(nullptr)
         {
             _start = new T[v.capacity()];
-            memcpy(_start, v._start, sizeof(T) * v.size());
+            for(size_t i = 0; i < v.size(); i++)
+            {
+                _start[i] = v._start[i];// 深拷贝,vector里面可能是自定义类型
+            }
             _finish = _start + v.size();
             _endofstorage = _start + v.capacity();
         }
@@ -64,6 +111,10 @@ namespace cai
         {
             if(_start)
             {
+                for(iterator it = _start; it != _finish; ++it)
+                {
+                    it->~T();// 显式调用析构函数
+                }
                 delete[] _start;
                 _start = _finish = _endofstorage = nullptr;
             }
@@ -112,7 +163,14 @@ namespace cai
                 size_t sz = size();
                 // 开空间并复制原来的数据
                 T* tmp = new T[newcapapcity];
-                memcpy(tmp, _start, sizeof(T) * size());
+                for(size_t i = 0; i < sz; i++)
+                {
+                    // 深拷贝，vector里面可能是自定义类型
+                    tmp[i] = _start[i];
+                    // 释放原来的空间元素，显式调用vector内部元素的析构函数
+                    _start[i].~T();
+
+                }
                 // 释放原空间并重定位_start
                 delete[] _start;
                 _start = tmp;
