@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 
 namespace cai {
     template<class T>
@@ -14,8 +15,13 @@ namespace cai {
         {}
     };
 
-    template<class T>
+    // 迭代器类，模版参数对应类型、引用类型和指针类型
+    // typedef __list_iterator<T, T&, T*> iterator;
+    // typedef __list_iterator<T, const T&, const T*> const_iterator;
+
+    template<class T, class Ref, class Ptr>
     struct __list_iterator {
+        typedef __list_iterator<T, Ref, Ptr> self;
         typedef list_node<T> Node;
         Node* _node; // 指向节点的指针
 
@@ -23,30 +29,41 @@ namespace cai {
             : _node(n)
         {}
 
-        T& operator*() {
+        Ref operator*() {
             return _node->data;
         }
 
-        T* operator->() { // 建议增加 -> 运算符
+        Ptr operator->() { // 建议增加 -> 运算符
             return &(_node->data);
         }
 
-        __list_iterator<T>& operator++() {
+        self& operator++() {
             _node = _node->next;
             return *this;
         }
 
-        __list_iterator<T> operator++(int) { // 后置++
-            __list_iterator<T> tmp(*this);
+        self operator++(int) { // 后置++
+            self tmp(*this);
             _node = _node->next;
             return tmp;
         }
 
-        bool operator!=(const __list_iterator<T>& it) const {
+        self operator--(int) { // 后置--
+            self tmp(*this);
+            _node = _node->prev;
+            return tmp;
+        }
+
+        self& operator--() {
+            _node = _node->prev;
+            return *this;
+        }
+
+        bool operator!=(const self& it) const {
             return _node != it._node;
         }
 
-        bool operator==(const __list_iterator<T>& it) const {
+        bool operator==(const self& it) const {
             return _node == it._node;
         }
     };
@@ -57,53 +74,121 @@ namespace cai {
     private:
         Node* head;
     public:
-        typedef __list_iterator<T> iterator;
+        typedef __list_iterator<T, T&, T*> iterator;
+        typedef __list_iterator<T, const T&, const T*> const_iterator;
 
-        list() {
+        void empty_init()
+        {
             head = new Node(); // 申请头节点
             head->prev = head;
             head->next = head;
         }
 
+        list() 
+        {
+            empty_init();
+        }
+
+        list(const list<T>& other)
+        {
+            empty_init();
+
+            for(auto& value : other) {
+                push_back(value);
+            }
+        }
+
+        void swap(list<T>& other) {
+            std::swap(head, other.head);
+        }
+
+        list<T>& operator=(const list<T>& other)
+        {
+            if (this != &other) {
+                list<T> tmp(other); // 复制构造
+                swap(tmp); // 交换资源
+            }
+            return *this;
+        }
+
         // 析构函数需要简单实现，防止内存泄漏
-        ~list() {
+        ~list() 
+        {
             clear();
             delete head;
         }
 
-        void clear() {
+        void clear() 
+        {
             iterator it = begin();
             while (it != end()) {
                 it = erase(it);
             }
         }
 
-        iterator begin() {
+        iterator begin() 
+        {
+            // 可以通过单参数构造隐式类型转换来简化代码，这里显式写出来说明
             return iterator(head->next);
         }
 
-        iterator end() {
+        iterator end() 
+        {
             return iterator(head);
         }
 
-        void push_back(const T& value) {
-            Node* newnode = new Node(value);
-            Node* tail = head->prev;
+        const_iterator begin() const
+        {
+            // 可以通过单参数构造隐式类型转换来简化代码，这里显式写出来说明
+            return const_iterator(head->next);
+        }
 
-            tail->next = newnode;
-            newnode->prev = tail;
-            newnode->next = head;
-            head->prev = newnode;
+        const_iterator end() const
+        {
+            return const_iterator(head);
+        }
+
+        size_t size() const {
+            size_t count = 0;
+            Node* cur = head->next;
+            while (cur != head) {
+                ++count;
+                cur = cur->next;
+            }
+            return count;
+        }
+
+        // 增删查改
+        iterator insert(iterator pos, const T& value)
+        {
+            Node* newnode = new Node(value);
+            Node* prev = pos._node->prev;
+            newnode->next = pos._node;
+            newnode->prev = prev;
+            prev->next = newnode;
+            pos._node->prev = newnode;
+
+            return iterator(newnode);
+        }
+
+        void push_front(const T& value) {
+            insert(begin(), value);
+        }
+
+        void push_back(const T& value) {
+            insert(end(), value);
         }
 
         iterator erase(iterator pos) {
+            assert(pos != end()); // 不能删除end()位置的元素
+
             Node* cur = pos._node;
             Node* prev = cur->prev;
             Node* next = cur->next;
 
             prev->next = next;
             next->prev = prev;
-            delete cur;
+            delete cur;  
             return iterator(next);
         }
     };
