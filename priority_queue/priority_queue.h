@@ -42,7 +42,7 @@ namespace cai
                 }
             }
         public:
-            // 默认建立小根堆
+            // 默认建立大根堆
             template<class Inputiterator>
             priority_queue(Inputiterator first, Inputiterator last)
             {
