@@ -3,11 +3,12 @@
 
 namespace cai
 {
-    template<class T, class Container = std::vector<T>>
+    template<class T, class Container = std::vector<T>, class Compare = std::less<T>>
     class priority_queue
     {
         private:
             Container _con;
+            Compare _comp;
 
             void adjust_down(int root)
             {
@@ -16,12 +17,12 @@ namespace cai
                 while(child < _con.size())
                 {
                     // 选出左右孩子中较小的一个
-                    if(child + 1 < _con.size() && _con[child + 1] < _con[child])
+                    if(child + 1 < _con.size() && _comp(_con[child], _con[child + 1]))
                     {
                         ++child;
                     }
                     // 如果父节点已经比孩子节点小了，就不需要调整了
-                    if(_con[parent] <= _con[child])
+                    if(!_comp(_con[parent], _con[child]))
                     {
                         break;
                     }
@@ -29,6 +30,16 @@ namespace cai
                     parent = child;
                 }
             
+            }
+
+            void adjust_up(int child)
+            {
+                int parent = (child - 1) / 2;
+                while(child > 0 && _comp(_con[child], _con[parent]))
+                {
+                    std::swap(_con[child], _con[parent]);
+                    child = parent;
+                }
             }
         public:
             // 默认建立小根堆
@@ -59,9 +70,20 @@ namespace cai
                 adjust_down(0);
             } 
 
+            void push(const T& value)
+            {
+                _con.push_back(value);
+                adjust_up(_con.size() - 1);
+            }
+
             bool empty() const
             {
                 return _con.empty();
+            }
+
+            size_t size() const
+            {
+                return _con.size();
             }
         
     };
