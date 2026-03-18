@@ -12,36 +12,55 @@ namespace cai
 
             void adjust_down(int root)
             {
-                int parent = root;
-                int child = 2 * parent + 1;
-                while(child < _con.size())
-                {
-                    // 选出左右孩子中较小的一个
-                    if(child + 1 < _con.size() && _comp(_con[child], _con[child + 1]))
-                    {
-                        ++child;
-                    }
-                    // 如果父节点已经比孩子节点小了，就不需要调整了
-                    if(!_comp(_con[parent], _con[child]))
-                    {
-                        break;
-                    }
-                    std::swap(_con[parent], _con[child]);
-                    parent = child;
-                }
+                size_t parent = root;
+                size_t child = parent * 2 + 1; // 默认先看左孩子
             
+                while (child < _con.size())
+                {
+                    // 选出左右孩子中较大的那个
+                    // 如果 左孩子 < 右孩子，就选右孩子
+                    if (child + 1 < _con.size() && _comp(_con[child], _con[child + 1]))
+                    {
+                       ++child;
+                    }
+
+                    // 如果 父亲 < 孩子，就向下交换
+                    if (_comp(_con[parent], _con[child]))
+                    {
+                        std::swap(_con[parent], _con[child]);
+                        parent = child;
+                        child = parent * 2 + 1;
+                    }
+                    else
+                    {
+                        break; // 父亲已经足够大，调整结束
+                    }
+                }
             }
 
             void adjust_up(int child)
             {
                 int parent = (child - 1) / 2;
-                while(child > 0 && _comp(_con[child], _con[parent]))
+                while (child > 0)
                 {
-                    std::swap(_con[child], _con[parent]);
-                    child = parent;
+                    // 如果 父亲 < 孩子，则向上交换
+                    if (_comp(_con[parent], _con[child])) 
+                    {
+                        std::swap(_con[child], _con[parent]);
+                        child = parent;
+                        parent = (child - 1) / 2;
+                    }
+                    else
+                    {
+                        break; // 父亲已经不小于孩子了，调整结束
+                    }
                 }
             }
+
         public:
+            priority_queue()
+            {}
+            
             // 默认建立大根堆
             template<class Inputiterator>
             priority_queue(Inputiterator first, Inputiterator last)
