@@ -55,8 +55,24 @@ void testlist2()
     std::cout << std::endl;
 }
 
+void testlist3()
+{
+    cai::list<int> l;
+    l.push_back(1);
+    l.push_back(2);
+    l.push_back(3);
+    l.push_back(4);
+    cai::list<int>::reverse_iterator rit = l.rbegin();
+    while(rit != l.rend())
+    {
+        std::cout << *rit << " ";
+        ++rit;
+    }
+    std::cout << std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
-    testlist2();
+    testlist3();
     return 0;
 }

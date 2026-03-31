@@ -1,6 +1,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include "ReverseIterator.h"
+
 namespace cai {
     template<class T>
     struct list_node {
@@ -77,6 +79,9 @@ namespace cai {
         typedef __list_iterator<T, T&, T*> iterator;
         typedef __list_iterator<T, const T&, const T*> const_iterator;
 
+        typedef cai::Reverseiterator<iterator, T&, T*> reverse_iterator;
+        typedef cai::Reverseiterator<const_iterator, const T&, const T*> const_reverse_iterator;
+
         void empty_init()
         {
             head = new Node(); // 申请头节点
@@ -146,6 +151,27 @@ namespace cai {
         const_iterator end() const
         {
             return const_iterator(head);
+        }
+
+        reverse_iterator rbegin()
+        {
+            // 可以通过单参数构造隐式类型转换来简化代码，这里显式写出来说明
+            return reverse_iterator(end());
+        }
+
+        const_reverse_iterator rbegin() const
+        {
+            return const_reverse_iterator(end());
+        }
+
+        reverse_iterator rend()
+        {
+            return reverse_iterator(begin());
+        }
+
+        const_reverse_iterator rend() const
+        {
+            return const_reverse_iterator(begin());
         }
 
         size_t size() const {

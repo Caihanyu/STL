@@ -112,8 +112,24 @@ void vectortest5()
     }
 }
 
+void vectortest6()
+{
+    cai::vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+    cai::vector<int>::reverse_iterator rit = v.rbegin();
+    while(rit != v.rend())
+    {
+        cout << *rit << " ";
+        ++rit;
+    }
+    cout << endl;
+}
+
 int main()
 {
-    vectortest5();
+    vectortest6();
     return 0;
 }

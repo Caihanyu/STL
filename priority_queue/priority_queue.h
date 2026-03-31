@@ -5,7 +5,7 @@ namespace cai
 {
     template<class T, class Container = std::vector<T>, class Compare = std::less<T>>
     class priority_queue
-    {
+    {  
         private:
             Container _con;
             Compare _comp;

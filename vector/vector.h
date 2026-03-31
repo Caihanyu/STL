@@ -1,5 +1,9 @@
+#pragma once
+
 #include <iostream>
 #include <assert.h>
+
+#include "Reverseiterator.h"
 
 namespace cai
 {
@@ -9,6 +13,9 @@ namespace cai
         public:
             typedef T* iterator;
             typedef const T* const_iterator;
+
+            typedef Reverseiterator<iterator, T&, T*> reverse_iterator;
+            typedef Reverseiterator<const_iterator, const T&, const T*> const_reverse_iterator;
 
             iterator begin()
             {
@@ -28,6 +35,27 @@ namespace cai
             const_iterator end() const
             {
                 return _finish;
+            }
+
+             reverse_iterator rbegin()
+            {
+                // 可以通过单参数构造隐式类型转换来简化代码，这里显式写出来说明
+                return reverse_iterator(end());
+            }
+
+            const_reverse_iterator rbegin() const
+            {
+                return const_reverse_iterator(end());
+            }
+
+            reverse_iterator rend()
+            {
+                return reverse_iterator(begin());
+            }
+
+            const_reverse_iterator rend() const
+            {
+                return const_reverse_iterator(begin());
             }
         
         // n个val初始化
