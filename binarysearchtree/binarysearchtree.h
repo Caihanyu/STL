@@ -19,6 +19,31 @@ private:
 public:
     BinarySearchTree() : root(nullptr) {}
 
+    BinarySearchTree(const BinarySearchTree<K>& other) : root(nullptr)
+    {
+        // 复制构造函数
+        _copy(other.root);
+    }
+
+    // BinarySearchTree<K>& operator=(const BinarySearchTree<K>& other)
+    // {
+    //     if (this != &other)
+    //     {
+    //         // 先清空当前树
+    //         _clear(root);
+    //         root = nullptr;
+    //         // 复制其他树
+    //         _copy(other.root);
+    //     }
+    //     return *this;
+    // }
+
+    BinarySearchTree<K>& operator=(BinarySearchTree<K> other)
+    {
+        std::swap(root, other.root);
+        return *this;
+    }
+
     void insert(K key)
     {
         _insert(root, key);
@@ -39,6 +64,16 @@ public:
         _inorder(root);
     }
 private:
+    void _copy(BinarySearchTreeNode<K>* node)
+    {
+        if (node != nullptr)
+        {
+            insert(node->_key);
+            _copy(node->left);
+            _copy(node->right);
+        }
+    }
+
     void _insert(BinarySearchTreeNode<K>*& node, K key)
     {
         // 空节点直接插入
